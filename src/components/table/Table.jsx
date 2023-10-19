@@ -9,8 +9,8 @@ const Table = ({ boxsData }) => {
           <th className="rounded-tl"></th>
           <th>אינפורמציה נוספת</th>
           <th>ארגז מלמעלה</th>
-          <th>עמודה מימין</th>
-          <th>בלוק מימין</th>
+          <th>עמודה</th>
+          <th>בלוק</th>
           <th>קומה</th>
           <th>שורה</th>
           <th>מיקום במחסן</th>

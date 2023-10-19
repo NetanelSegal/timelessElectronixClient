@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Icon from "../icon/Icon";
 import { getPositionFromNum } from "../../reusable/function";
 
@@ -25,6 +25,16 @@ const TableRow = ({ boxData }) => {
     );
   }
 
+  const [isCopied, setIsCopied] = useState();
+  const copyTooltip = () => {
+    setIsCopied(true);
+    console.log(isCopied);
+    setTimeout(() => {
+      setIsCopied(false);
+      console.log(isCopied);
+    }, 1500);
+  };
+
   const {
     extraInfo,
     numFromTop,
@@ -37,12 +47,12 @@ const TableRow = ({ boxData }) => {
   } = boxData;
 
   const getBlockPosition = (areaInWarehouse, index) => {
-    if (areaInWarehouse == "כניסה") {
-      return getPositionFromNum(index, 2);
+    if (areaInWarehouse == "מידוף כניסה") {
+      return getPositionFromNum(index, 1);
     }
 
-    if (areaInWarehouse == "פנימי") {
-      return getPositionFromNum(index, 5);
+    if (areaInWarehouse == "מידוף פנימי") {
+      return getPositionFromNum(index, 4);
     }
   };
 
@@ -79,7 +89,18 @@ ${extraInfo != undefined ? "אקסטרה: " + extraInfo : ""}`;
           <button>
             <Icon iconName={"edit"} />
           </button>
-          <button onClick={copyBoxData}>
+          <button
+            className="relative"
+            onClick={() => {
+              copyTooltip();
+              copyBoxData();
+            }}
+          >
+            {isCopied && (
+              <span className="absolute left-full w-36 rounded bg-slate-600 py-1 text-sm text-white">
+                Copied to clipboard
+              </span>
+            )}
             <Icon iconName={"copy"} />
           </button>
         </div>
