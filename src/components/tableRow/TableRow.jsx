@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Icon from "../icon/Icon";
 import { getPositionFromNum } from "../../reusable/function";
 
@@ -28,10 +28,8 @@ const TableRow = ({ boxData }) => {
   const [isCopied, setIsCopied] = useState();
   const copyTooltip = () => {
     setIsCopied(true);
-    console.log(isCopied);
     setTimeout(() => {
       setIsCopied(false);
-      console.log(isCopied);
     }, 1500);
   };
 
@@ -44,41 +42,93 @@ const TableRow = ({ boxData }) => {
     level,
     isInsideRow,
     boxNumber,
+    maxColNum,
+    maxBoxNumFromTop,
   } = boxData;
 
   const getBlockPosition = (areaInWarehouse, index) => {
-    if (areaInWarehouse == "מידוף כניסה") {
-      return getPositionFromNum(index, 1);
+    if (!areaInWarehouse.includes("מידוף")) return;
+
+    let max;
+    if (areaInWarehouse == "מידוף כניסה") max = 1;
+    else if (areaInWarehouse == "מידוף פנימי") max = 4;
+
+    const middle = max / 2;
+
+    // if closer to left
+    if (index > middle && index < max) {
+      return "משמאל " + getPositionFromNum(index, max);
     }
 
-    if (areaInWarehouse == "מידוף פנימי") {
-      return getPositionFromNum(index, 4);
+    return "מימין " + getPositionFromNum(index, max);
+  };
+
+  const getColPosition = (max, index) => {
+    const pos = getPositionFromNum(index, max);
+    const middle = max / 2;
+
+    if (pos == "ראשון") return "ראשונה";
+
+    if (pos == "אחרון") return "אחרונה";
+
+    // if closer to left
+    if (index > middle && index < max) {
+      return "משמאל " + getPositionFromNum(index, max);
     }
+
+    return "מימין " + getPositionFromNum(index, max);
+  };
+
+  const getNumFromTopPosition = (max, index) => {
+    const middle = max / 2;
+    const pos = getPositionFromNum(index, max);
+
+    if (typeof pos == "string") {
+      if (pos == "אחרון") return "תחתון";
+      if (pos == "ראשון") return "עליון";
+      return pos;
+    }
+
+    // if closer to bottom
+    if (index > middle && index < max) {
+      return "מהתחתון " + getPositionFromNum(index, max);
+    }
+
+    return "מהעליון " + getPositionFromNum(index, max);
   };
 
   const copyBoxData = () => {
     let strCopy;
-    if (areaInWarehouse == "פנימי" || areaInWarehouse == "כניסה") {
+    if (areaInWarehouse.includes("מידוף")) {
       strCopy = `
 מס' ארגז: ${boxNumber}
 אזור מחסן: ${areaInWarehouse}
 בלוק: ${getBlockPosition(areaInWarehouse, blockFromRight)}
 שורה: ${isInsideRow ? "פנימית" : "חיצונית"}
 קומה: ${level == 0 ? "קרקע" : level}
-עמודה מימין: ${columnFromRight}
-ארגז מלמעלה:  ${numFromTop}
+עמודה: ${getColPosition(maxColNum, columnFromRight)}
+גובה ארגז: ${getNumFromTopPosition(maxBoxNumFromTop, numFromTop)}
 ${extraInfo ? "אקסטרה: " + extraInfo : ""}`;
     } else {
       strCopy = `
 מס' ארגז: ${boxNumber}
 אזור מחסן: ${areaInWarehouse}
-עמודה מימין: ${columnFromRight != undefined ? columnFromRight : ""}
-ארגז מלמעלה: ${numFromTop != undefined ? numFromTop : ""}
+עמודה: ${
+        columnFromRight != undefined
+          ? getColPosition(maxColNum, columnFromRight)
+          : ""
+      }
+גובה ארגז: ${
+        numFromTop != undefined
+          ? getNumFromTopPosition(maxBoxNumFromTop, numFromTop)
+          : ""
+      }
 ${extraInfo != undefined ? "אקסטרה: " + extraInfo : ""}`;
     }
 
     navigator.clipboard.writeText(strCopy);
   };
+
   return (
     <tr className="odd:bg-white even:bg-gray-100">
       <td className="text-center group-last:rounded-bl">
@@ -106,8 +156,8 @@ ${extraInfo != undefined ? "אקסטרה: " + extraInfo : ""}`;
         </div>
       </td>
       <td>{extraInfo}</td>
-      <td>{numFromTop}</td>
-      <td>{columnFromRight}</td>
+      <td>{getNumFromTopPosition(maxBoxNumFromTop, numFromTop)}</td>
+      <td>{getColPosition(maxColNum, columnFromRight)}</td>
       <td>{getBlockPosition(areaInWarehouse, blockFromRight)}</td>
       <td>{level == 0 ? "קרקע" : level}</td>
       <td>{isInsideRow ? "פנימית" : "חיצונית"}</td>

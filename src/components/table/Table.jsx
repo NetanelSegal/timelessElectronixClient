@@ -8,7 +8,7 @@ const Table = ({ boxsData }) => {
         <tr className="bg-gray-900 text-white">
           <th className="rounded-tl"></th>
           <th>אינפורמציה נוספת</th>
-          <th>ארגז מלמעלה</th>
+          <th>גובה ארגז</th>
           <th>עמודה</th>
           <th>בלוק</th>
           <th>קומה</th>
