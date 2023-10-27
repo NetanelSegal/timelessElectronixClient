@@ -17,3 +17,21 @@ td,
 th {
   @apply border;
 }
+#nav {
+  @apply px-[10vw] md:px-[5vw];
+}
+#page {
+  @apply px-[10vw];
+}
+
+input {
+  @apply rounded-xl border px-5 py-2 font-bold text-black;
+}
+
+label {
+  @apply text-base font-semibold;
+}
+
+.searchBoxForm:focus-within {
+  box-shadow: 0px 0px 5px rgb(22, 163, 74);
+}
